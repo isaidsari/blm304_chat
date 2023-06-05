@@ -3,6 +3,8 @@ package client;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.List;
 
 public class Client extends Thread
 {
@@ -60,9 +62,9 @@ public class Client extends Thread
                     System.out.println("Server " + host + ":" + port + " disconnected");
                     break;
                 }
-
                 String data = new String(buffer, 0, size);
                 System.out.println("Server " + host + ":" + port + " sent: " + data);
+                parseMessage(data);
             }
         }
         catch (Exception e)
@@ -90,6 +92,48 @@ public class Client extends Thread
             }
         }
 
+    }
+
+    public void send(String data)
+    {
+        try
+        {
+            out.write(data.getBytes());
+            System.out.println("Sent to server " + host + ":" + port + ": " + data);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Client send error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void parseMessage(String message)
+    {
+        String[] parts = message.split(":");
+        String command = parts[0];
+        String[] args = Arrays.copyOfRange(parts, 1, parts.length);
+
+        switch (command)
+        {
+            case "message":
+                System.out.println("Server " + host + ":" + port + " sent message: " + args[0]);
+                break;
+
+            case "clientlist":
+                System.out.println("Server " + host + ":" + port + " sent clientlist: " + args[0]);
+                List<String> clients = Arrays.asList(args[0].split(","));
+                break;
+
+            case "groupList":
+                System.out.println("Server " + host + ":" + port + " sent groupList: " + args[0]);
+                List<String> groups = Arrays.asList(args[0].split(","));
+                break;
+
+            default:
+                System.out.println("Server " + host + ":" + port + " sent unknown command: " + command);
+                break;
+        }
     }
 
     public void onDisconnect()

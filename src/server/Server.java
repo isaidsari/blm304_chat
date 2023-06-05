@@ -3,11 +3,13 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Server extends Thread
 {
     private boolean running = false;
+
     private int port;
     private ServerSocket serverSocket;
 
@@ -45,7 +47,10 @@ public class Server extends Thread
                 {
                     @Override
                     public void onMessageEvent(ClientHandler source, String message)
-                    {super.onMessageEvent(source, message);}
+                    {
+                        super.onMessageEvent(source, message);
+                        onMessage(source, message);
+                    }
 
                     @Override
                     public void onConnectEvent(ClientHandler source)
@@ -83,6 +88,22 @@ public class Server extends Thread
             }
         }
 
+    }
+
+    void onMessage(ClientHandler source, String message)
+    {
+        String[] parts = message.split(":");
+        String command = parts[0];
+        String[] args = Arrays.copyOfRange(parts, 1, parts.length);
+
+        switch (command)
+        {
+            case "msg":
+                System.out.println("Client " + source.name + " sent message: '" + args[0] + "'");
+                break;
+            default:
+                break;
+        }
     }
 
     void onConnect(ClientHandler source)

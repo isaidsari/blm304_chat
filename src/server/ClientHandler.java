@@ -14,7 +14,7 @@ public class ClientHandler extends Thread implements ClientEventHandler
     private OutputStream out;
 
     private static int id = 0;
-    private String name;
+    public String name;
 
     private static final int BUFFER_SIZE = 1024;
     private byte[] buffer;
@@ -87,6 +87,20 @@ public class ClientHandler extends Thread implements ClientEventHandler
                 e.printStackTrace();
             }
         }
+
+    }
+
+    public void send(String data)
+    {
+        try
+        {
+            out.write(data.getBytes());
+        }
+        catch (Exception e)
+        {
+            System.out.println("Client error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void parseMessage(String message)
@@ -102,11 +116,8 @@ public class ClientHandler extends Thread implements ClientEventHandler
                         + " set name to '" + name + "' -> '" + args[0] + "'" );
                 name = args[0];
                 break;
-            case "msg":
-                String msg = args[0];
-                break;
             default:
-                System.out.println("Unknown command: " + command);
+                break;
         }
 
     }
